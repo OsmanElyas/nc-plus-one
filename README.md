@@ -8,4 +8,7 @@ The app will store information about users, events, venues and RSVPs, allowing u
 run this command to create the database
     -psql -f db/setup.sql
 
-    
+## Environment setup
+
+Create a .env file in the root of the project, it should contain your pistgresql credentials similar to the .env.example file
+
