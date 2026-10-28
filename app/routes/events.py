@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException
-from db.connection import get_connection
+from fastapi import APIRouter, HTTPException, Depends
+from app.db.connection import get_connection
+
+from app.auth.dependecncies import get_current_user
 
 events_router = APIRouter(prefix="/events", tags=["events"])
 
-@events_router.get("/", status_code=200)
+@events_router.get("/", status_code=200, dependencies=[Depends(get_current_user)])
 def list_events():
     conn = get_connection()
     cursor = conn.cursor()
@@ -13,7 +15,7 @@ def list_events():
     conn.close()
     return {"events":[{"id": event[0], "title": event[1], "starts_at": event[2], "ends_at": event[3], "location": event[4]} for event in events]}
 
-@events_router.get("/{event_id}", status_code=200)
+@events_router.get("/{event_id}", status_code=200, dependencies=[Depends(get_current_user)])
 def list_events(event_id: str):
     if not event_id.isdigit():
         raise HTTPException(status_code=400, detail={"code": "BAD REQUEST", "message": "ID MUST BE A Valid Integer!"})

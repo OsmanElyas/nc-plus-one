@@ -1,6 +1,7 @@
 import json
-from connection import get_connection
-
+from app.db.connection import get_connection
+from app.auth.password import hash_password
+import sys
 
 def drop_tables(cursor):
     cursor.execute("DROP TABLE IF EXISTS rsvps;")
@@ -9,8 +10,8 @@ def drop_tables(cursor):
     cursor.execute("DROP TABLE IF EXISTS users;")
     
 
-def load_data(filepath):
-    with open(f"db/data/{filepath}.json") as file:
+def load_data(filename, environment):
+    with open(f"data/{environment}/{filename}.json") as file:
         data = json.load(file)
 
     return data
@@ -58,20 +59,17 @@ def create_tables(cursor):
     )
     
 
-
-    
-
-def insert_users(cursor):
-    users = load_data("users")
+def insert_users(cursor, environment):
+    users = load_data("users", environment)
 
     for user in users:
         cursor.execute(
             "INSERT INTO users (email, password, name) VALUES (%s, %s, %s);", 
-            (user["email"], user["password"], user["name"])
+            (user["email"], hash_password(user["password"]), user["name"])
         )
 
-def insert_venues(cursor):
-    venues = load_data("venues")
+def insert_venues(cursor, environment):
+    venues = load_data("venues", environment)
 
     for venue in venues:
         cursor.execute(
@@ -79,8 +77,8 @@ def insert_venues(cursor):
             (venue["name"], venue["address"], venue["capacity"])
         )
 
-def insert_events(cursor):
-    events = load_data("events")
+def insert_events(cursor, environment):
+    events = load_data("events", environment)
 
     for event in events:
         cursor.execute(
@@ -89,8 +87,8 @@ def insert_events(cursor):
         )
 
 
-def insert_rsvps(cursor):
-    rsvps = load_data("rsvps")
+def insert_rsvps(cursor, environment):
+    rsvps = load_data("rsvps", environment)
 
     for rsvp in rsvps:
         cursor.execute(
@@ -100,17 +98,17 @@ def insert_rsvps(cursor):
 
     
 
-def seed():
-    connection = get_connection()
+def seed(environment="dev"):
+    connection = get_connection(environment)
     cursor = connection.cursor()
 
     drop_tables(cursor)
     create_tables(cursor)
 
-    insert_users(cursor)
-    insert_venues(cursor)
-    insert_events(cursor)
-    insert_rsvps(cursor)
+    insert_users(cursor, environment)
+    insert_venues(cursor, environment)
+    insert_events(cursor, environment)
+    insert_rsvps(cursor, environment)
 
     connection.commit()
     cursor.close()
@@ -118,4 +116,5 @@ def seed():
 
 
 if __name__ == "__main__":
-    seed()
+    environment = sys.argv[1] if len(sys.argv) > 1 else "dev"
+    seed(environment)
