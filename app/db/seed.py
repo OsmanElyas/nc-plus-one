@@ -41,8 +41,8 @@ def create_tables(cursor):
         "event_id SERIAL PRIMARY KEY,"
         "title VARCHAR(255) NOT NULL," \
         "description VARCHAR," \
-        "starts_at DATE NOT NULL," \
-        "ends_at DATE NOT NULL," \
+        "starts_at TIMESTAMPTZ NOT NULL," \
+        "ends_at TIMESTAMPTZ NOT NULL," \
         "organiser_id INT REFERENCES users(user_id)," \
         "venue_id INT REFERENCES venues(venue_id)," \
         "created_at TIMESTAMP DEFAULT NOW()" \
