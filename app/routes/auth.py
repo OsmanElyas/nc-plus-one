@@ -1,16 +1,10 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from app.models.auth import LoginRequest, RegisterRequest
 from app.auth.jwt import create_access_token
-from app.db.queries.user import get_user
-from app.auth.password import verify_password
+from app.db.queries.user import get_user, create_user
+from app.auth.password import hash_password, verify_password
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
-
-
-class LoginRequest(BaseModel):
-    email: str
-    password: str
-
 
 
 @auth_router.post("/login")
@@ -36,6 +30,19 @@ def login(body: LoginRequest):
         "token_type": "bearer"
     }
 
-        
+@auth_router.post("/register", status_code=201)
+def register_user(user: RegisterRequest):
 
-    
+    existing_user = get_user(user.email)
+
+    if existing_user:
+        raise HTTPException(
+            status_code=409,
+            detail="Email already registered"
+        )
+
+    hashed_password = hash_password(user.password)
+
+    new_user = create_user(user.name, user.email, hashed_password)
+
+    return {"user": new_user}

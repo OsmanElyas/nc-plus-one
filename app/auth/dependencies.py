@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from app.auth.jwt import get_secret
+from app.db.queries.user import get_user_by_id
 import jwt
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -19,3 +20,11 @@ def get_current_user(credentials: HTTPAuthorizationCredentials | None = Depends(
         user_id = int(payload["sub"])
     except:
         raise unauthorised
+
+    user = get_user_by_id(user_id)
+    if user is None:
+        raise unauthorised
+
+    return user_id
+
+    
