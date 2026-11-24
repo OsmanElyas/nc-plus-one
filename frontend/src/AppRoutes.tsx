@@ -1,11 +1,20 @@
 import { Route, Routes } from "react-router"
-import LoginPage from "./components/Events"
-
+import AppLayout from "./layouts/AppLayout"
+import AccountPage from "./pages/AccountPage"
+import EventsPage from "./pages/EventsPage"
+import HomePage from "./pages/HomePage"
+import NotFoundPage from "./pages/NotFoundPage"
 
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<LoginPage />} />
+      <Route element={<AppLayout />}>
+        <Route index element={<HomePage />} />
+        <Route path="events" element={<EventsPage />} />
+        <Route path="login" element={<AccountPage mode="login" />} />
+        <Route path="signup" element={<AccountPage mode="signup" />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
     </Routes>
   )
 }
