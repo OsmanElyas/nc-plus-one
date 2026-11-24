@@ -8,7 +8,7 @@ from app.db.queries.events import create_event as insert_function, update_event_
 
 events_router = APIRouter(prefix="/events", tags=["events"])
 
-@events_router.get("", status_code=200, dependencies=[Depends(get_current_user)])
+@events_router.get("", status_code=200)
 def list_events():
     conn = get_connection()
     cursor = conn.cursor()
@@ -18,7 +18,7 @@ def list_events():
     conn.close()
     return {"events":[{"id": event[0], "title": event[1], "starts_at": event[2], "ends_at": event[3], "location": event[4]} for event in events]}
 
-@events_router.get("/{event_id}", status_code=200, dependencies=[Depends(get_current_user)])
+@events_router.get("/{event_id}", status_code=200)
 def get_event(event_id: str):
     if not event_id.isdigit():
         raise HTTPException(status_code=400, detail={"code": "BAD REQUEST", "message": "ID MUST BE A Valid Integer!"})
@@ -93,18 +93,20 @@ def create_event(event: EventRequest, organiser_id = Depends(get_current_user)):
     return {"event": created_event}
 
 
-@events_router.patch("/{event_id}", status_code=201)
+@events_router.patch("/{event_id}", status_code=200)
 def update_event(event_id:int, updates: dict, user_id = Depends(get_current_user)):
-    event = get_event_by_id(user_id)
+    event = get_event_by_id(event_id)
 
     if not event:
-            raise HTTPException(status_code=404, detail="Event is not found")
+        raise HTTPException(status_code=404, detail="Event is not found")
 
     if event["organiser_id"] != user_id:
         raise HTTPException(status_code=403, detail="Forbidden")
 
+    updated_event = update_event_query(event_id, updates)
 
-    updated_event = update_event_query(event_id, updates, user_id)
+    if updated_event is None:
+        raise HTTPException(status_code=400, detail="No valid fields supplied")
 
     return {"event": updated_event}
 

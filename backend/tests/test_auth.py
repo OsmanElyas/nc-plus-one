@@ -4,7 +4,7 @@ import pytest
 
 def test_login_returns_token(client):
     response = client.post(
-        "/auth/login",
+        "/api/auth/login",
         json={
             "email": "user_c@example.com",
             "password": "password_c"
@@ -16,7 +16,7 @@ def test_login_returns_token(client):
 
 def test_login_with_wrong_password_returns_401(client):
     response = client.post(
-        "/auth/login",
+        "/api/auth/login",
         json={
             "email": "user_c@example.com",
             "password": "password"
@@ -27,7 +27,7 @@ def test_login_with_wrong_password_returns_401(client):
 
 def test_unknown_user_returns_401(client):
     response = client.post(
-        "/auth/login",
+        "/api/auth/login",
         json={
             "email": "user_c@e",
             "password": "password_c"
@@ -38,7 +38,7 @@ def test_unknown_user_returns_401(client):
 
 def test_login_with_missing_password_returns_400(client):
     response = client.post(
-        "/auth/login",
+        "/api/auth/login",
         json={
             "email": "user_c@example.com",
             "password": ""
@@ -51,7 +51,7 @@ def test_login_with_missing_password_returns_400(client):
 def test_creating_a_user_returns_201(client, db_cleanup):
     db_cleanup("DELETE FROM users WHERE email = %s", ("alice@exampleqe.com",))
     response = client.post(
-        "/auth/register",
+        "/api/auth/register",
         json={
             "name": "Alice Smith",
             "email": "alice@exampleqe.com",
@@ -68,7 +68,7 @@ def test_creating_a_user_returns_201(client, db_cleanup):
 
 def test_recreating_a_user_returns_409(client):
     response = client.post(
-        "/auth/register",
+        "/api/auth/register",
         json={
             "name": "user_c",
             "email": "user_c@example.com",
@@ -86,7 +86,7 @@ def test_registration_stores_hashed_password(client, db_cleanup):
     db_cleanup("DELETE FROM users WHERE email = %s", (email,))
 
     response = client.post(
-        "/auth/register",
+        "/api/auth/register",
         json={"name": "Hash Check", "email": email, "password": password},
     )
 
@@ -106,6 +106,6 @@ def test_registration_stores_hashed_password(client, db_cleanup):
     ],
 )
 def test_registration_with_missing_field_returns_400(client, payload):
-    response = client.post("/auth/register", json=payload)
+    response = client.post("/api/auth/register", json=payload)
 
     assert response.status_code == 400

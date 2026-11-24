@@ -4,7 +4,7 @@ from app.auth.jwt import create_access_token
 
 
 def test_get_organiser_stats(client, auth_headers):
-    response = client.get("/organisers/2/stats", headers=auth_headers)
+    response = client.get("/api/organisers/2/stats", headers=auth_headers)
 
     assert response.status_code == 200
     assert response.json()["stats"] == {
@@ -18,7 +18,7 @@ def test_get_organiser_stats(client, auth_headers):
 
 
 def test_organiser_rank_is_global(client, auth_headers):
-    response = client.get("/organisers/1/stats", headers=auth_headers)
+    response = client.get("/api/organisers/1/stats", headers=auth_headers)
 
     assert response.status_code == 200
     assert response.json()["stats"]["organiser_rank"] == 3
@@ -27,12 +27,12 @@ def test_organiser_rank_is_global(client, auth_headers):
 @pytest.mark.parametrize("token", [None, "invalid-token"])
 def test_get_organiser_stats_requires_valid_token(client, token):
     headers = {} if token is None else {"Authorization": f"Bearer {token}"}
-    response = client.get("/organisers/2/stats", headers=headers)
+    response = client.get("/api/organisers/2/stats", headers=headers)
 
     assert response.status_code == 401
 
 
 def test_get_missing_organiser_stats_returns_404(client, auth_headers):
-    response = client.get("/organisers/99999/stats", headers=auth_headers)
+    response = client.get("/api/organisers/99999/stats", headers=auth_headers)
 
     assert response.status_code == 404

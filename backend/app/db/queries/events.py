@@ -50,7 +50,10 @@ def update_event_query(event_id, updates):
             values.append(value)
     values.append(event_id)
 
-    query = f"UPDATE events SET {", ".join(set_parts)} WHERE event_id = %s RETURNING *"
+    if not set_parts:
+        return None
+
+    query = f"UPDATE events SET {', '.join(set_parts)} WHERE event_id = %s RETURNING *"
 
 
     try:

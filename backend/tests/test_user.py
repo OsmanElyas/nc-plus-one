@@ -1,8 +1,21 @@
 import pytest
 
 
+def test_profile_returns_authenticated_user(client, auth_headers):
+    response = client.get("/api/user/me", headers=auth_headers)
+
+    assert response.status_code == 200
+    assert response.json()["user"]["id"] == 1
+
+
+def test_profile_requires_valid_token(client):
+    response = client.get("/api/user/me")
+
+    assert response.status_code == 401
+
+
 def test_user_events_returns_ranked_events_in_start_order(client, auth_headers):
-    response = client.get("/user/me/events", headers=auth_headers)
+    response = client.get("/api/user/me/events", headers=auth_headers)
 
     assert response.status_code == 200
     events = response.json()["events"]
@@ -18,6 +31,6 @@ def test_user_events_returns_ranked_events_in_start_order(client, auth_headers):
     [None, {"Authorization": "Bearer invalid-token"}],
 )
 def test_user_events_requires_valid_token(client, headers):
-    response = client.get("/user/me/events", headers=headers)
+    response = client.get("/api/user/me/events", headers=headers)
 
     assert response.status_code == 401

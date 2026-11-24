@@ -1,7 +1,9 @@
 from datetime import datetime, timezone
 
 import pytest
+
 from app.auth.jwt import create_access_token
+
 
 def event_payload():
     return {
@@ -13,32 +15,33 @@ def event_payload():
     }
 
 
-def test_len_of_events_is_correct(client, auth_headers):
-    response = client.get("/events", headers=auth_headers)
+def test_len_of_events_is_correct(client):
+    response = client.get("/api/events")
     assert response.status_code == 200
-    assert len(response.json()["events"]) == 5
+    assert len(response.json()["events"] ) == 5
 
-def test_returns_correct_event(client, auth_headers):
-    response = client.get("/events/1", headers=auth_headers)
-   
+
+def test_returns_correct_event(client):
+    response = client.get("/api/events/1")
+
     assert response.status_code == 200
     assert response.json()["title"] == "event_d"
 
 
-def test_non_integer_returns_400(client, auth_headers):
-    response = client.get("/events/osman", headers=auth_headers)
+def test_non_integer_returns_400(client):
+    response = client.get("/api/events/osman")
     assert response.status_code == 400
-   
 
-def test_event_not_found_returns_404(client, auth_headers):
-    response = client.get("/events/10000", headers=auth_headers)
+
+def test_event_not_found_returns_404(client):
+    response = client.get("/api/events/10000")
     assert response.status_code == 404
 
 
 def test_event_organiser_can_see_all_attendees(client):
     token = create_access_token(3)
     response = client.get(
-        "/events/5/attendees",
+        "/api/events/5/attendees",
         headers={"Authorization": f"Bearer {token}"},
     )
 
@@ -47,13 +50,13 @@ def test_event_organiser_can_see_all_attendees(client):
 
 
 def test_non_organiser_cannot_see_event_attendees(client, auth_headers):
-    response = client.get("/events/5/attendees", headers=auth_headers)
+    response = client.get("/api/events/5/attendees", headers=auth_headers)
 
     assert response.status_code == 403
 
 
 def test_attendees_for_missing_event_returns_404(client, auth_headers):
-    response = client.get("/events/10000/attendees", headers=auth_headers)
+    response = client.get("/api/events/10000/attendees", headers=auth_headers)
 
     assert response.status_code == 404
 
@@ -63,7 +66,7 @@ def test_create_event_uses_authenticated_user(client, auth_headers, db_cleanup):
     payload["organiser_id"] = 2
     db_cleanup("DELETE FROM events WHERE title = %s", (payload["title"],))
 
-    response = client.post("/events", json=payload, headers=auth_headers)
+    response = client.post("/api/events", json=payload, headers=auth_headers)
 
     assert response.status_code == 201
     event = response.json()["event"]
@@ -79,14 +82,14 @@ def test_create_event_uses_authenticated_user(client, auth_headers, db_cleanup):
 
 
 def test_create_event_requires_authentication(client):
-    response = client.post("/events", json=event_payload())
+    response = client.post("/api/events", json=event_payload())
 
     assert response.status_code == 401
 
 
 def test_create_event_rejects_invalid_token(client):
     response = client.post(
-        "/events",
+        "/api/events",
         json=event_payload(),
         headers={"Authorization": "Bearer invalid-token"},
     )
@@ -102,7 +105,7 @@ def test_create_event_rejects_missing_fields(client, auth_headers, missing_field
     payload = event_payload()
     payload.pop(missing_field)
 
-    response = client.post("/events", json=payload, headers=auth_headers)
+    response = client.post("/api/events", json=payload, headers=auth_headers)
 
     assert response.status_code == 400
 
@@ -115,7 +118,7 @@ def test_create_event_rejects_malformed_fields(client, auth_headers, field, valu
     payload = event_payload()
     payload[field] = value
 
-    response = client.post("/events", json=payload, headers=auth_headers)
+    response = client.post("/api/events", json=payload, headers=auth_headers)
 
     assert response.status_code == 400
 
