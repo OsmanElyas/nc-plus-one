@@ -1,10 +1,13 @@
 import './site.css'
 import './App.css'
 import AppRoutes from './AppRoutes'
+import { AuthProvider } from './auth/AuthProvider'
 
 function App() {
   return (
-    <AppRoutes />
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   )
 }
 

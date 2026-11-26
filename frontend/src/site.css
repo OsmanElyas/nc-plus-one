@@ -376,6 +376,99 @@ a {
   margin-top: 0;
 }
 
+.account-form {
+  display: grid;
+  max-width: 440px;
+  gap: 18px;
+  margin-top: 30px;
+}
+
+.account-field {
+  display: grid;
+  gap: 7px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.account-field input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 400;
+}
+
+.account-field input:focus-visible {
+  outline: 3px solid rgb(23 75 64 / 22%);
+  border-color: var(--forest);
+}
+
+.account-submit,
+.logout-button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  background: var(--forest);
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.account-submit {
+  justify-self: start;
+  min-width: 150px;
+}
+
+.account-submit:hover,
+.logout-button:hover {
+  background: #226354;
+}
+
+.account-submit:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.account-error {
+  color: #a2382d;
+  font-size: 13px;
+}
+
+.account-status {
+  padding-block: 70px;
+  color: var(--muted);
+}
+
+.account-greeting {
+  max-width: 180px;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logout-button {
+  min-height: 38px;
+  padding-inline: 12px;
+  background: transparent;
+  color: var(--forest);
+  border: 1px solid var(--line);
+}
+
+.logout-button:hover {
+  background: #edf2d8;
+  color: var(--forest);
+}
+
 .site-footer {
   display: flex;
   min-height: 64px;

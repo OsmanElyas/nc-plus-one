@@ -1,6 +1,9 @@
 import { Link, NavLink } from "react-router"
+import { useAuth } from "../auth/AuthProvider"
 
 function SiteHeader() {
+  const { user, isLoading, signOut } = useAuth()
+
   return (
     <header className="site-header">
       <div className="header-inner">
@@ -11,12 +14,23 @@ function SiteHeader() {
         <nav className="main-nav" aria-label="Main navigation">
           <NavLink to="/events">Explore</NavLink>
           <div className="account-nav">
-            <NavLink className="login-link" to="/login">
-              Log in
-            </NavLink>
-            <NavLink className="signup-link" to="/signup">
-              Sign up
-            </NavLink>
+            {isLoading ? null : user ? (
+              <>
+                <span className="account-greeting">{user.name}</span>
+                <button className="logout-button" type="button" onClick={signOut}>
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <NavLink className="login-link" to="/login">
+                  Log in
+                </NavLink>
+                <NavLink className="signup-link" to="/signup">
+                  Sign up
+                </NavLink>
+              </>
+            )}
           </div>
         </nav>
       </div>
