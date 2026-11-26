@@ -7,13 +7,12 @@ export interface Event {
 }
 
 export interface EventDetail extends Event {
-  description: string;
+  description: string | null;
   address: string | null;
   capacity: number | null;
   created_at: string;
-  venue: {
+  organiser: {
     id: number;
     name: string;
-    address: string | null;
   } | null;
 }

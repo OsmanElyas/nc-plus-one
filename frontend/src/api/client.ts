@@ -2,6 +2,16 @@ import { clearAccessToken, getAccessToken, AUTH_EXPIRED_EVENT } from "../auth/to
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
+export class ApiError extends Error {
+  readonly status: number
+
+  constructor(message: string, status: number) {
+    super(message)
+    this.name = "ApiError"
+    this.status = status
+  }
+}
+
 async function readResponse(response: Response): Promise<unknown> {
   const text = await response.text()
   if (!text) return null
@@ -57,7 +67,7 @@ export async function requestJson<T>(path: string, init: RequestInit = {}): Prom
   }
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(payload, response.status))
+    throw new ApiError(getErrorMessage(payload, response.status), response.status)
   }
 
   return payload as T

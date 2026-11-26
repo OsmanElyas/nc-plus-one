@@ -25,10 +25,15 @@ def get_event(event_id: str):
     
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute( "SELECT event_id, description, title, starts_at, ends_at, venues.name, address, capacity, created_at " \
-    "FROM events INNER JOIN venues ON venues.venue_id = events.venue_id " \
-    "WHERE event_id = %s;",
-    (event_id,)
+    cursor.execute(
+        "SELECT events.event_id, events.description, events.title, events.starts_at, "
+        "events.ends_at, venues.name, venues.address, venues.capacity, events.created_at, "
+        "users.user_id, users.name "
+        "FROM events "
+        "INNER JOIN venues ON venues.venue_id = events.venue_id "
+        "LEFT JOIN users ON users.user_id = events.organiser_id "
+        "WHERE events.event_id = %s;",
+        (event_id,),
     )
     row = cursor.fetchone()
     if not row:
@@ -36,7 +41,18 @@ def get_event(event_id: str):
 
     cursor.close()
     conn.close()
-    return {"id": row[0],"description": row[1], "title": row[2], "starts_at": row[3], "ends_at": row[4], "location": row[5], "address": row[6], "capacity": row[7], "created_at": row[8]}
+    return {
+        "id": row[0],
+        "description": row[1],
+        "title": row[2],
+        "starts_at": row[3],
+        "ends_at": row[4],
+        "location": row[5],
+        "address": row[6],
+        "capacity": row[7],
+        "created_at": row[8],
+        "organiser": {"id": row[9], "name": row[10]} if row[9] is not None else None,
+    }
 
 
 

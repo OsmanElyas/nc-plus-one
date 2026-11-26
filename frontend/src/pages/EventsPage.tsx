@@ -1,8 +1,19 @@
 import EventGrid from "../components/EventGrid"
+import { useAuth } from "../auth/AuthProvider"
 import { useEvents } from "../hooks/useEvents"
+import { useMyEvents } from "../hooks/useMyEvents"
 
 function EventsPage() {
 	const { events, isLoading, error } = useEvents()
+	const { user, isLoading: isAuthLoading } = useAuth()
+	const {
+		events: myEvents,
+		isLoading: isMyEventsLoading,
+		error: myEventsError,
+		refresh: refreshMyEvents,
+	} = useMyEvents()
+	const isRsvpLoading = isAuthLoading || (Boolean(user) && isMyEventsLoading)
+	const isRsvpStatusUnknown = Boolean(user && myEventsError)
 
 	return (
 		<section className="events-page">
@@ -20,6 +31,12 @@ function EventsPage() {
 					</p>
 				)}
 			</header>
+			{user && myEventsError && (
+				<p className="events-page__message" role="alert">
+					Couldn’t load your RSVP status: {myEventsError}{" "}
+					<button type="button" onClick={refreshMyEvents}>Try again</button>
+				</p>
+			)}
 
 			{isLoading ? (
 				<p className="events-page__message">Loading events...</p>
@@ -30,7 +47,12 @@ function EventsPage() {
 			) : events.length === 0 ? (
 				<p className="events-page__message">No events are scheduled yet.</p>
 			) : (
-				<EventGrid events={events} />
+				<EventGrid
+					events={events}
+					myEvents={myEvents}
+					isRsvpLoading={isRsvpLoading || isRsvpStatusUnknown}
+					onRsvpChanged={refreshMyEvents}
+				/>
 			)}
 		</section>
 	)

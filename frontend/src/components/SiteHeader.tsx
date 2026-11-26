@@ -13,6 +13,7 @@ function SiteHeader() {
         </Link>
         <nav className="main-nav" aria-label="Main navigation">
           <NavLink to="/events">Explore</NavLink>
+          {!isLoading && user && <NavLink to="/my-events">My events</NavLink>}
           <div className="account-nav">
             {isLoading ? null : user ? (
               <>

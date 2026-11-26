@@ -26,6 +26,8 @@ def test_returns_correct_event(client):
 
     assert response.status_code == 200
     assert response.json()["title"] == "event_d"
+    assert response.json()["organiser"]["id"] == 1
+    assert response.json()["organiser"]["name"] == "user_c"
 
 
 def test_non_integer_returns_400(client):

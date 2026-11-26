@@ -1,12 +1,16 @@
 import { Link } from "react-router"
+import RSVPButton from "./RSVPButton"
 import type { Event } from "../../types/event"
 
 interface EventCardProps {
     event: Event
+    isRsvped: boolean
+    isRsvpLoading: boolean
+    onRsvpChanged: () => void
 }
 
 
-function EventCard({ event }: EventCardProps) {
+function EventCard({ event, isRsvped, isRsvpLoading, onRsvpChanged }: EventCardProps) {
     const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(event.starts_at)
     const date = new Date(isDateOnly ? `${event.starts_at}T12:00:00` : event.starts_at)
     const dateIsValid = !Number.isNaN(date.getTime())
@@ -36,10 +40,18 @@ function EventCard({ event }: EventCardProps) {
                     <p className="event-card__location">{event.location}</p>
                     {startTime && <p className="event-card__time">Starts at {startTime}</p>}
                 </div>
-                <div className="event-card__footer">
-                    <span className="event-card__action">View details <span aria-hidden="true">&rarr;</span></span>
-                </div>
             </Link>
+            <div className="event-card__actions">
+                <Link className="event-card__action" to={`/events/${event.id}`}>
+                    View details <span aria-hidden="true">&rarr;</span>
+                </Link>
+                <RSVPButton
+                    eventId={event.id}
+                    isRsvped={isRsvped}
+                    isLoading={isRsvpLoading}
+                    onChanged={onRsvpChanged}
+                />
+            </div>
         </li>
     )
 }
