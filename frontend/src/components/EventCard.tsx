@@ -16,21 +16,12 @@ function EventCard({ event }: EventCardProps) {
     const day = dateIsValid
         ? new Intl.DateTimeFormat("en-GB", { day: "2-digit" }).format(date)
         : "--"
-    const dateOptions: Intl.DateTimeFormatOptions = {
-        weekday: "short",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    }
-
-    if (!isDateOnly) {
-        dateOptions.hour = "2-digit"
-        dateOptions.minute = "2-digit"
-    }
-
-    const formattedDate = dateIsValid
-        ? new Intl.DateTimeFormat("en-GB", dateOptions).format(date)
-        : event.starts_at
+    const year = dateIsValid
+        ? new Intl.DateTimeFormat("en-GB", { year: "numeric" }).format(date)
+        : "----"
+    const startTime = dateIsValid && !isDateOnly
+        ? new Intl.DateTimeFormat("en-GB", { hour: "numeric", minute: "2-digit" }).format(date)
+        : null
 
     return (
         <li className="event-card">
@@ -38,14 +29,14 @@ function EventCard({ event }: EventCardProps) {
                 <time className="event-card__date" dateTime={event.starts_at}>
                     <span className="event-card__month">{month}</span>
                     <span className="event-card__day">{day}</span>
+                    <span className="event-card__year">{year}</span>
                 </time>
                 <div className="event-card__body">
-                    <p className="event-card__eyebrow">EVENT {event.id}</p>
                     <h2 className="event-card__title">{event.title}</h2>
                     <p className="event-card__location">{event.location}</p>
+                    {startTime && <p className="event-card__time">Starts at {startTime}</p>}
                 </div>
                 <div className="event-card__footer">
-                    <span className="event-card__full-date">{formattedDate}</span>
                     <span className="event-card__action">View details <span aria-hidden="true">&rarr;</span></span>
                 </div>
             </Link>
